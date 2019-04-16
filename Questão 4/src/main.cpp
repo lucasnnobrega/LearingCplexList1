@@ -58,14 +58,12 @@ subject to
 
 */
 
-//#include <iostream>
+#include <iostream>
 #include <ilcplex/ilocplex.h>
 
 using namespace std;
 
-int main()
-{
-    try{
+void q4(){
     // Creating a envirioment
     IloEnv env;
 
@@ -188,6 +186,13 @@ int main()
     }
 
     env.out();
+}
+
+
+int main()
+{
+    try{
+        q4();
     }
     catch( IloException &e){
         std::cout << "\n \n\e[31mError\e[0m" << endl << e << std::endl;
