@@ -60,26 +60,28 @@ subject to
 
 #include <iostream>
 #include <ilcplex/ilocplex.h>
+#include <cmath>
 
 using namespace std;
 
-void q4(){
+void q4()
+{
     // Creating a envirioment
     IloEnv env;
 
     // Constants
     IloInt nPlayers = 7;
-    IloNumArray rebote        (env, nPlayers, 1, 3, 2, 3, 3, 2, 2);
-    IloNumArray arremesso     (env, nPlayers, 3, 1, 3, 3, 3, 1, 2);
-    IloNumArray assistencia   (env, nPlayers, 3, 2, 2, 1, 3, 3, 3);
-    IloNumArray defesa        (env, nPlayers, 3, 2, 2, 1, 3, 3, 1);
+    IloNumArray rebote(env, nPlayers, 1, 3, 2, 3, 3, 2, 2);
+    IloNumArray arremesso(env, nPlayers, 3, 1, 3, 3, 3, 1, 2);
+    IloNumArray assistencia(env, nPlayers, 3, 2, 2, 1, 3, 3, 3);
+    IloNumArray defesa(env, nPlayers, 3, 2, 2, 1, 3, 3, 1);
 
-    IloNumArray positionA     (env, nPlayers, 0, 0, 1, 1, 1, 1, 1);
-    IloNumArray positionC     (env, nPlayers, 0, 1, 0, 1, 0, 1, 0);
-    IloNumArray positionD     (env, nPlayers, 1, 0, 1, 0, 1, 0, 1);
+    IloNumArray positionA(env, nPlayers, 0, 0, 1, 1, 1, 1, 1);
+    IloNumArray positionC(env, nPlayers, 0, 1, 0, 1, 0, 1, 0);
+    IloNumArray positionD(env, nPlayers, 1, 0, 1, 0, 1, 0, 1);
 
     // Decision variables
-    IloNumVarArray players    (env, nPlayers, 0, 1, ILOBOOL);
+    IloNumVarArray players(env, nPlayers, 0, 1, ILOBOOL);
 
     //Creating objective function
     IloExpr to_optimize(env);
@@ -100,7 +102,7 @@ void q4(){
     IloExpr sum_positionA(env);
     IloExpr sum_positionC(env);
     IloExpr sum_positionD(env);
-    
+
     IloExpr sum_all(env);
 
     for (int i = 0; i < players.getSize(); ++i)
@@ -117,26 +119,26 @@ void q4(){
         sum_all += players[i];
     }
 
-    IloRange mean_assistencia_restrition (env, 0, sum_assistencia, 14);
-    IloRange mean_arremesso_restrition   (env, 0, sum_arremesso,   14);
-    IloRange mean_rebote_restrition      (env, 0, sum_rebote,      14);
-    IloRange mean_defesa_restrition      (env, 0, sum_defesa,      14);
-    IloRange max_players_restrition      (env, 0, sum_all,          5);
+    IloRange mean_assistencia_restrition(env, 0, sum_assistencia, 14);
+    IloRange mean_arremesso_restrition(env, 0, sum_arremesso, 14);
+    IloRange mean_rebote_restrition(env, 0, sum_rebote, 14);
+    IloRange mean_defesa_restrition(env, 0, sum_defesa, 14);
+    IloRange max_players_restrition(env, 0, sum_all, 5);
 
-    IloRange sum_positionA_restrition    (env, 2, sum_positionA, IloInfinity);
-    IloRange sum_positionC_restrition    (env, 2, sum_positionC, IloInfinity);
-    IloRange sum_positionD_restrition    (env, 3, sum_positionD, IloInfinity);
-    
+    IloRange sum_positionA_restrition(env, 2, sum_positionA, IloInfinity);
+    IloRange sum_positionC_restrition(env, 2, sum_positionC, IloInfinity);
+    IloRange sum_positionD_restrition(env, 3, sum_positionD, IloInfinity);
+
     // Constrains
 
     // -3 < x3 + x5 <= 1
     IloRange r1(env, -3, players[2] + players[5], 1);
-    
+
     // 2*x1 - x3 - x5 <= 0
-    IloRange r2(env, -IloInfinity, 2* players[0] - players[3] - players[4], 0);
-    
+    IloRange r2(env, -IloInfinity, 2 * players[0] - players[3] - players[4], 0);
+
     // x2 + x3 == 1
-    IloRange r3(env, 1, players[1] + players[2] , 1);
+    IloRange r3(env, 1, players[1] + players[2], 1);
 
     /**************************************/
     //               MODEL
@@ -146,7 +148,7 @@ void q4(){
     IloModel model(env);
     // Adding obj function
     model.add(obj);
-    
+
     // Add constrains and ranges to the model
     model.add(mean_assistencia_restrition);
     model.add(mean_arremesso_restrition);
@@ -158,10 +160,9 @@ void q4(){
     model.add(sum_positionC_restrition);
     model.add(sum_positionD_restrition);
 
-    model.add(r1);    
+    model.add(r1);
     model.add(r2);
     model.add(r3);
-
 
     // Creating a CPLEX solver
     IloCplex cplex(env);
@@ -175,27 +176,32 @@ void q4(){
     cplex.out() << endl;
     cplex.out() << "solution status = " << cplex.getStatus() << endl;
 
-    cplex.out() << endl << "number of threads = " << cplex.getParam(IloCplex::Param::Threads) << endl;
-    cplex.out() << endl << "number of players = " << players.getSize() << endl;
-   
+    cplex.out() << endl
+                << "number of threads = " << cplex.getParam(IloCplex::Param::Threads) << endl;
+    cplex.out() << endl
+                << "number of players = " << players.getSize() << endl;
+
     cplex.out() << "\e[32mcost\e[0m = " << cplex.getObjValue() << endl;
 
-    for(int i; i < players.getSize(); ++i){
-    //for(int i; i <= players.getSize(); ++i){
-        cplex.out() << "x " << i << " = " << (cplex.getValue(players[i]) == 1) << " " << cplex.getValue(players[i]) << endl;
+    for (int i; i < players.getSize(); ++i)
+    {
+        //for(int i; i <= players.getSize(); ++i){
+        cplex.out() << "x " << i << " = " << round(cplex.getValue(players[i])) << " " << cplex.getValue(players[i]) << endl;
     }
 
     env.out();
 }
 
-
 int main()
 {
-    try{
+    try
+    {
         q4();
     }
-    catch( IloException &e){
-        std::cout << "\n \n\e[31mError\e[0m" << endl << e << std::endl;
+    catch (IloException &e)
+    {
+        std::cout << "\n \n\e[31mError\e[0m" << endl
+                  << e << std::endl;
         e.end();
     }
 
