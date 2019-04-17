@@ -6,19 +6,19 @@ using namespace std;
 int main()
 {
 
-    // Creating a envirioment
+    // Creating a environment
     IloEnv env;
 
     // Decision variables
     IloNumVar MilkPasteur(env, 50000, 60000, ILOFLOAT);
     IloNumVar Cheese(env, 0, 3500, ILOFLOAT);
-    IloNumVar Yorgut(env, 0, 20000, ILOFLOAT);
+    IloNumVar Yogurt(env, 0, 20000, ILOFLOAT);
 
     // Objective Function
-    IloObjective obj(env, 0.07 * MilkPasteur + 1.04 * Cheese + 0.2 * Yorgut, IloObjective::Maximize);
+    IloObjective obj(env, 0.07 * MilkPasteur + 1.04 * Cheese + 0.2 * Yogurt, IloObjective::Maximize);
 
     // Constraints and ranges
-    IloRange r1(env, 0, MilkPasteur + (10 / 1) * Cheese + (2.5 / 1) * Yorgut, 100000);
+    IloRange r1(env, 0, MilkPasteur + (10 / 1) * Cheese + (2.5 / 1) * Yogurt, 100000);
 
     /**************************************/
     //               MODEL
@@ -46,7 +46,7 @@ int main()
     cplex.out() << "cost   = " << cplex.getObjValue() << endl;
     cplex.out() << "Milk Pasteur = " << cplex.getValue(MilkPasteur) << endl;
     cplex.out() << "Cheese = " << cplex.getValue(Cheese) << endl;
-    cplex.out() << "Yorgut = " << cplex.getValue(Yorgut) << endl;
+    cplex.out() << "Yogurt = " << cplex.getValue(Yogurt) << endl;
 
     env.end();
 
